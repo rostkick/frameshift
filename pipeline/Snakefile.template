@@ -23,4 +23,17 @@ rule cdhit_filter:
 	output: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_cdhit_filtred.fasta"
 	shell: "cdhit -i {input} -o {output} -c {SEQ_IDENTITY} -s {SEQ_LEN_CUTOFF}"
 
+rule blastp:
+	input: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_cdhit_filtred.fasta"
+	output: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_{EVALUE}_blastp_result.tsv"
+	shell: "blastp -db {DATA_PATH}pdb_db/pdbaa -query {input} -evalue {E.VALUE} -max_target_seqs 1 -outfmt '6 qseqid sseqid evalue qseq sseq' -out {output}"
 
+rule get_id:
+	input: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_{EVALUE}_blastp_result.tsv"
+	output: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_{EVALUE}_id.txt"
+	shell: "cut -d\| -f2 {input} > {output}"
+
+rule efetch_sequences:
+	input: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_{EVALUE}_id.txt"
+	output: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_{EVALUE}_pdb.fasta"
+	shell: "IFS=$'\n'; for i in $(cat {input}); do esearch -db protein -query $i | efetch -format fasta; done > {output}"

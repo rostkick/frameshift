@@ -15,6 +15,8 @@ def main(args):
     file = re.sub('{MIN_INT_LENGTH}', args.min_int, file)
     file = re.sub('{SEQ_IDENTITY}', args.seq_I, file)
     file = re.sub('{SEQ_LEN_CUTOFF}', args.seq_L, file)
+    file = re.sub('{E.VALUE}', args.evalue, file)
+    file = re.sub('{EVALUE}', re.sub('\.', '', args.evalue), file)
     
     print(file)
     with open('Snakefile', 'w') as w:
@@ -35,7 +37,8 @@ if __name__=='__main__':
     parser.add_argument('-min_int', type=str, default='100', help='Min interval length.')
     parser.add_argument('-seq_I', type=str, default='0.75', help="This is the default cd-hit's 'global sequence identity' calculated as:\nnumber of identical amino acids in alignment\ndivided by the full length of the shorter sequence.")
     parser.add_argument('-seq_L', type=str, default='0.75', help="this is the default cd-hit's 'length identity cutoff',\nf.e., if set to 0.9, the shorter sequences need to be\nat least 0.9 length of the representative of the cluster.")
-    
+    parser.add_argument('-evalue', type=str, default='0.1', help="blastp evalue.")
+
     args = parser.parse_args()
     
     # class Args():

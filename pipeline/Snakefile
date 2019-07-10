@@ -23,4 +23,17 @@ rule cdhit_filter:
 	output: "data/Scler_300_100_cdhit_filtred.fasta"
 	shell: "cdhit -i {input} -o {output} -c 0.75 -s 0.75"
 
+rule blastp:
+	input: "data/Scler_300_100_cdhit_filtred.fasta"
+	output: "data/Scler_300_100_001_blastp_result.tsv"
+	shell: "blastp -db data/pdb_db/pdbaa -query {input} -evalue 0.01 -max_target_seqs 1 -outfmt '6 qseqid sseqid evalue qseq sseq' -out {output}"
 
+rule get_id:
+	input: "data/Scler_300_100_001_blastp_result.tsv"
+	output: "data/Scler_300_100_001_id.txt"
+	shell: "cut -d\| -f2 {input} > {output}"
+
+rule efetch_sequences:
+	input: "data/Scler_300_100_001_id.txt"
+	output: "data/Scler_300_100_001_pdb.fasta"
+	shell: "IFS=$'\n'; for i in $(cat {input}); do esearch -db protein -query $i | efetch -format fasta; done > {output}"

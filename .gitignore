@@ -1,0 +1,8 @@
+pipline/.snakemake/
+pipline/.snakemake/log/*
+pipline/.snakemake/*
+pipline/data/*
+pipline/data/
+data/
+.snakemake/
+
