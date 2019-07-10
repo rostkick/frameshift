@@ -9,14 +9,18 @@ rule get_frame_shifts:
 	input:
 		dna = "data/Scler_predicted_orfs.fasta",
 		genome = "data/Sclerotinia_sclerotiorum.ASM14694v1.dna.toplevel.fa"
-	output: "data/Scler_300_100.txt"
+	output: "data/Scler_300_100.tsv"
 	run:
-		shell(f"python3 scripts/Frshft_FINDER.py -input_dna {input.dna} -input_genome {input.genome} -min_orf 300 -interval_length 100 -output {output}")
+		shell("python3 scripts/Frshft_FINDER.py -input_dna {input.dna} -input_genome {input.genome} -min_orf 300 -interval_length 100 -output {output}")
 
-rule get_intersected_prot:
-	input: "data/Scler_300_100.txt"
-	output: "data/Scler_300_100_intersected_prot.fasta"
-	shell: "grep -i 'PROT_INTER' -A1 {input} | grep -v '\-\-' > {output}"
+rule parse_frame_shifts:
+	input: "data/Scler_300_100.tsv"
+	output: 
+		full_tsv = "data/Scler_300_100_prefinal.tsv",
+		subset_fasta = "data/Scler_300_100_intersected_prot.fasta",
+		subset_tsv = "data/Scler_300_100_intersected_prot.tsv"
+	run:
+		shell("python3 scripts/parse_fs.py -input {input} -output_full_tsv {output.full_tsv} -output_subset_fasta {output.subset_fasta} -output_subset_tsv {output.subset_tsv}")
 
 rule cdhit_filter:
 	input: "data/Scler_300_100_intersected_prot.fasta"

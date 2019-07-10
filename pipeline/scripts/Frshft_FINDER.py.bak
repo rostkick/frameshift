@@ -289,7 +289,7 @@ class Intersection:
                 self.inter_dna_1_name = f'{self.chrom}:{orf1}_vs_{orf2}:{x1}:{x2}:+'
                 self.inter_dna_1 = self._get_interval(x1, x2, '+')
                 
-                self.inter_dna_2_name  = f'{self.chrom}:{orf1}_vs_{orf2}:{x2}:{x1}:-'
+                self.inter_dna_2 = f'{self.chrom}:{orf1}_vs_{orf2}:{x2}:{x1}:-'
                 self.inter_dna_2 = self._get_interval(x2, x1, '-')
                 
                 self.inter_prot_1_name = f'{self.chrom}:{orf1}_vs_{orf2}:{x1}:{x2}:+'
@@ -476,15 +476,16 @@ class Intersection:
         
     def get_full_batch(self):
         
-        return f"{self.global_orf_name}\t{self.global_orf}\t"\
-                f"{self.dna_1_name}\t{self.dna_1}\t"\
-                f"{self.dna_2_name}\t{self.dna_2}\t"\
-                f"{self.inter_dna_1_name}\t{self.inter_dna_1}\t"\
-                f"{self.inter_dna_2_name}\t{self.inter_dna_2}\t"\
-                f"{self.prot_1_name}\t{self.prot_1}\t"\
-                f"{self.prot_2_name}\t{self.prot_2}\t"\
-                f"{self.inter_prot_1_name}\t{self.inter_prot_1}\t"\
-                f"{self.inter_prot_2_name}\t{self.inter_prot_2}\n"
+        return f">GLOBAL_ORF:{self.global_orf_name}\n{self.global_orf}\n"\
+                f">DNA_MAIN:{self.dna_1_name}\n{self.dna_1}\n"\
+                f">DNA_ALT:{self.dna_2_name}\n{self.dna_2}\n"\
+                f">INTERSECTION_DNA_MAIN:{self.inter_dna_1_name}\n{self.inter_dna_1}\n"\
+                f">INTERSECTION_DNA_ALT:{self.inter_dna_2_name}\n{self.inter_dna_2}\n"\
+                f">PROT_MAIN:{self.prot_1_name}\n{self.prot_1}\n"\
+                f">PROT_ALT:{self.prot_2_name}\n{self.prot_2}\n"\
+                f">PROT_INTERSECTED_MAIN:{self.inter_prot_1_name}\n{self.inter_prot_1}\n"\
+                f">PROT_INTERSECTED_ALT:{self.inter_prot_2_name}\n{self.inter_prot_2}\n"\
+                f"=========================================================\n"
      
         
 def main(args):
@@ -492,9 +493,6 @@ def main(args):
     fasta_dna_dict, orfs_dict = get_data(args)
     
     with open(args.output, 'w') as w:
-        w.write('GLOBAL_ORF\tGLOBAL_ORF_SEQ\tDNA_MAIN\tDNA_MAIN_SEQ\tDNA_ALT\tDNA_ALT_SEQ\t'+
-                'INTERSECTION_DNA_MAIN\tINTERSECTION_DNA_MAIN_SEQ\tINTERSECTION_DNA_ALT\t INTERSECTION_DNA_ALT_SEQ\t'+\
-                'PROT_MAIN\tPROT_MAIN_SEQ\tPROT_ALT\tPROT_ALT_SEQ\tPROT_INTERSECTED_MAIN\tPROT_INTERSECTED_MAIN_SEQ\tPROT_INTERSECTED_ALT\tPROT_INTERSECTED_ALT_SEQ\n')
         for chrom, orfs in orfs_dict.items():
             for dna1_name, dna2_name in itertools.combinations(orfs, 2):
                 if all([len(fasta_dna_dict[f"{chrom}:{dna1_name}"])>=args.min_orf,

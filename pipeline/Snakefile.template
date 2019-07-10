@@ -9,14 +9,18 @@ rule get_frame_shifts:
 	input:
 		dna = "{DATA_PATH}{PREFIX}predicted_orfs.fasta",
 		genome = "{GENOME}"
-	output: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}.txt"
+	output: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}.tsv"
 	run:
-		shell(f"python3 {SCRIPTS_PATH}Frshft_FINDER.py -input_dna {input.dna} -input_genome {input.genome} -min_orf {MIN_ORF_LENGTH} -interval_length {MIN_INT_LENGTH} -output {output}")
+		shell("python3 {SCRIPTS_PATH}Frshft_FINDER.py -input_dna {input.dna} -input_genome {input.genome} -min_orf {MIN_ORF_LENGTH} -interval_length {MIN_INT_LENGTH} -output {output}")
 
-rule get_intersected_prot:
-	input: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}.txt"
-	output: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_intersected_prot.fasta"
-	shell: "grep -i 'PROT_INTER' -A1 {input} | grep -v '\-\-' > {output}"
+rule parse_frame_shifts:
+	input: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}.tsv"
+	output: 
+		full_tsv = "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_prefinal.tsv",
+		subset_fasta = "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_intersected_prot.fasta",
+		subset_tsv = "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_intersected_prot.tsv"
+	run:
+		shell("python3 {SCRIPTS_PATH}parse_fs.py -input {input} -output_full_tsv {output.full_tsv} -output_subset_fasta {output.subset_fasta} -output_subset_tsv {output.subset_tsv}")
 
 rule cdhit_filter:
 	input: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_intersected_prot.fasta"
