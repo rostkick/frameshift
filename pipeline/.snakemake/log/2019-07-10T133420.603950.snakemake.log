@@ -9,11 +9,11 @@ Job counts:
 	1	get_intersected_prot
 	3
 
-[Tue Jul  9 21:29:46 2019]
+[Wed Jul 10 13:34:20 2019]
 rule get_frame_shifts:
     input: data/Scler_predicted_orfs.fasta, data/Sclerotinia_sclerotiorum.ASM14694v1.dna.toplevel.fa
-    output: data/Scler_{prms.min_orf_length}_{prms.min_int_length}.txt
+    output: data/Scler_300_100.txt
     jobid: 2
 
 Terminating processes on user request, this might take some time.
-Complete log: /home/rskick/Projects/amyl/frame_shift_func/frameshift/pipeline/.snakemake/log/2019-07-09T212946.919835.snakemake.log
+Complete log: /home/rskick/Projects/amyl/frame_shift_func/frameshift/pipeline/.snakemake/log/2019-07-10T133420.603950.snakemake.log

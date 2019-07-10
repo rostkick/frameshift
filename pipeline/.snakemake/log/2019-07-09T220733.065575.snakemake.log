@@ -1,3 +1,0 @@
-SyntaxError:
-Input and output files have to be specified as strings or lists of strings.
-  File "/home/rskick/Projects/amyl/frame_shift_func/frameshift/pipeline/Snakefile", line 50, in <module>

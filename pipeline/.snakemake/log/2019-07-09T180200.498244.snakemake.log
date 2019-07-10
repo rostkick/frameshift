@@ -1,4 +1,0 @@
-Building DAG of jobs...
-MissingInputException in line 6 of /home/rskick/Projects/amyl/frame_shift_func/frameshift/pipeline/Snakefile:
-Missing input files for rule get_frame_shifts:
-Scler_predicted_orfs.fasta
