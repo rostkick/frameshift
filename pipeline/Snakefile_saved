@@ -1,0 +1,62 @@
+ 
+# class params():
+# 	def __init__(self):
+# 		self.min_orf_length = 300
+# 		self.min_int_length = 100
+# 		self.seq_identity = 0.75 # this is the default cd-hit's "global sequence identity" calculated as:
+# 								   # number of identical amino acids in alignment
+# 								   # divided by the full length of the shorter sequence
+
+# 		self.seq_len_cutoff = 0.75 # this is the default cd-hit's "length identity cutoff",
+# 									# f.e., if set to 0.9, the shorter sequences need to be
+# 		 							# at least 90% length of the representative of the cluster
+
+# params = params()
+# # params =\
+# # 	{
+# # 	"min_orf_length": 300,
+# # 	"min_int_length": 100,
+
+# 	# "seq_identity": 0.75, # this is the default cd-hit's "global sequence identity" calculated as:
+# 	# 					   # number of identical amino acids in alignment
+# 	# 					   # divided by the full length of the shorter sequence
+
+# 	# "seq_len_cutoff": 0.75 # this is the default cd-hit's "length identity cutoff",
+# 	# 						# f.e., if set to 0.9, the shorter sequences need to be
+#  # 							# at least 90% length of the representative of the cluster
+# # 	}
+
+
+# configfile: "config.yaml"
+# def paramFunc(key, wildcards, config):
+#     return config[key].format(wildcards=wildcards, config=config)
+
+
+MIN_ORF_LENGTH = 300
+MIN_INT_LENGTH = 100
+SEQ_IDENTITY = 0.75
+SEQ_LEN_CUTOFF = 0.75
+
+rule get_orf:
+	input: "data/Sclerotinia_sclerotiorum.ASM14694v1.dna.toplevel.fa"
+	output: "data/Scler_predicted_orfs.fasta"
+	shell: "getorf -sequence {input} -outseq {output} -find 3"
+
+rule get_frame_shifts:
+	input:
+		dna = "data/Scler_predicted_orfs.fasta",
+		genome = "data/Sclerotinia_sclerotiorum.ASM14694v1.dna.toplevel.fa"
+	output: "data/Scler_{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}.txt"
+	run:
+		shell(f"python3 scripts/Frshft_FINDER.py -input_dna {input.dna} -input_genome {input.genome} -min_orf {params.min_orf_length} -interval_length {params.min_int_length} -output {output}")
+
+rule get_intersected_prot:
+	input: "data/Scler_{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}.txt"
+	output: "data/Scler_{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_intersected_prot.fasta"
+	shell: "grep -i 'PROT_INTER' -A1 {input} | grep -v '\-\-' > {output}"
+
+rule cdhit_filter:
+	input: "data/Scler_{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_intersected_prot.fasta"
+	output: "data/Scler_{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_cdhit_filtred.fasta"
+	shell: "cdhit -i {input} -o {output} -c {SEQ_IDENTITY} -s {SEQ_LEN_CUTOFF}"
+

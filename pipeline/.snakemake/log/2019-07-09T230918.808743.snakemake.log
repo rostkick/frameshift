@@ -1,0 +1,21 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	cdhit_filter
+	1	get_frame_shifts
+	1	get_intersected_prot
+	3
+
+[Tue Jul  9 23:09:18 2019]
+rule get_frame_shifts:
+    input: data/Scler_predicted_orfs.fasta, data/Sclerotinia_sclerotiorum.ASM14694v1.dna.toplevel.fa
+    output: data/Scler_{prms.MIN_ORF_LENGTH}_{prms.MIN_INT_LENGTH}.txt
+    jobid: 2
+    wildcards: MIN_ORF_LENGTH={prms.MIN_ORF_LENGTH}_{prms.MIN_INT, MIN_INT_LENGTH=LENGTH}
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/rskick/Projects/amyl/frame_shift_func/frameshift/pipeline/.snakemake/log/2019-07-09T230918.808743.snakemake.log

@@ -1,0 +1,16 @@
+Building DAG of jobs...
+Job counts:
+	count	jobs
+	1	cdhit_filter
+	1	get_frame_shifts
+	1	get_intersected_prot
+	3
+
+[Tue Jul  9 21:08:43 2019]
+rule get_frame_shifts:
+    input: Scler_predicted_orfs.fasta, Sclerotinia_sclerotiorum.ASM14694v1.dna.toplevel.fa
+    output: Scler_{params.min_orf_length}_{params.min_int_length}.txt
+    jobid: 2
+
+RuleException in line 30 of /home/rskick/Projects/amyl/frame_shift_func/frameshift/pipeline/Snakefile:
+'Params' object has no attribute 'min_orf_length]'

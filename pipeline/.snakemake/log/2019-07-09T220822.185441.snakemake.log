@@ -1,0 +1,5 @@
+Building DAG of jobs...
+MissingInputException in line 43 of /home/rskick/Projects/amyl/frame_shift_func/frameshift/pipeline/Snakefile:
+Missing input files for rule get_frame_shifts:
+100
+300

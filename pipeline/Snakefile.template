@@ -1,0 +1,26 @@
+
+
+rule get_orf:
+	input: "{GENOME}"
+	output: "{DATA_PATH}{PREFIX}predicted_orfs.fasta"
+	shell: "getorf -sequence {input} -outseq {output} -find 3"
+
+rule get_frame_shifts:
+	input:
+		dna = "{DATA_PATH}{PREFIX}predicted_orfs.fasta",
+		genome = "{GENOME}"
+	output: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}.txt"
+	run:
+		shell(f"python3 {SCRIPTS_PATH}Frshft_FINDER.py -input_dna {input.dna} -input_genome {input.genome} -min_orf {MIN_ORF_LENGTH} -interval_length {MIN_INT_LENGTH} -output {output}")
+
+rule get_intersected_prot:
+	input: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}.txt"
+	output: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_intersected_prot.fasta"
+	shell: "grep -i 'PROT_INTER' -A1 {input} | grep -v '\-\-' > {output}"
+
+rule cdhit_filter:
+	input: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_intersected_prot.fasta"
+	output: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_cdhit_filtred.fasta"
+	shell: "cdhit -i {input} -o {output} -c {SEQ_IDENTITY} -s {SEQ_LEN_CUTOFF}"
+
+

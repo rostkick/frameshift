@@ -1,0 +1,19 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	cdhit_filter
+	1	get_frame_shifts
+	1	get_intersected_prot
+	3
+
+[Tue Jul  9 21:58:30 2019]
+rule get_frame_shifts:
+    input: data/Scler_predicted_orfs.fasta, data/Sclerotinia_sclerotiorum.ASM14694v1.dna.toplevel.fa
+    output: data/Scler_{params.min_orf_length}_{params.min_int_length}.txt
+    jobid: 2
+
+Terminating processes on user request, this might take some time.
+Complete log: /home/rskick/Projects/amyl/frame_shift_func/frameshift/pipeline/.snakemake/log/2019-07-09T215830.463197.snakemake.log

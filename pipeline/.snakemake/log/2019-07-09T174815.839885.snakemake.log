@@ -1,0 +1,19 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	get_orf
+	1
+
+[Tue Jul  9 17:48:16 2019]
+rule get_orf:
+    input: Sclerotinia_sclerotiorum.ASM14694v1.dna.toplevel.fa
+    output: Scler_predicted_orfs
+    jobid: 0
+
+[Tue Jul  9 17:48:18 2019]
+Finished job 0.
+1 of 1 steps (100%) done
+Complete log: /home/rskick/Projects/amyl/frame_shift_func/frameshift/pipeline/.snakemake/log/2019-07-09T174815.839885.snakemake.log

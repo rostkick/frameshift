@@ -1,0 +1,4 @@
+Building DAG of jobs...
+MissingInputException in line 54 of /home/rskick/Projects/amyl/frame_shift_func/frameshift/pipeline/Snakefile:
+Missing input files for rule get_intersected_prot:
+data/Scler_{prms.min_orf_length}_{prms.min_int_length}.txt
