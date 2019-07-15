@@ -22,7 +22,7 @@ rule parse_frame_shifts:
 	run:
 		shell("python3 {SCRIPTS_PATH}parse_fs.py -input {input} -output_full_tsv {output.full_tsv} -output_subset_fasta {output.subset_fasta} -output_subset_tsv {output.subset_tsv}")
 
-rule cdhit_filter:
+rule cdhit_filter:	
 	input: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_intersected_prot.fasta"
 	output: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_cdhit_filtred.fasta"
 	shell: "cdhit -i {input} -o {output} -c {SEQ_IDENTITY} -s {SEQ_LEN_CUTOFF}"
@@ -30,7 +30,7 @@ rule cdhit_filter:
 rule blastp:
 	input: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_cdhit_filtred.fasta"
 	output: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_{EVALUE}_blastp_result.tsv"
-	shell: "blastp -db {DATA_PATH}pdb_db/pdbaa -query {input} -evalue {E.VALUE} -max_target_seqs 1 -outfmt '6 qseqid sseqid evalue qseq sseq' -out {output}"
+	shell: "blastp -db {DATA_PATH}pdb_db/pdbaa -query {input} -evalue {E.VALUE} -max_target_seqs 1 -max_hsps 1 -outfmt '6 qseqid sseqid evalue qseq sseq' -out {output}"
 
 rule get_id:
 	input: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_{EVALUE}_blastp_result.tsv"
@@ -41,3 +41,13 @@ rule efetch_sequences:
 	input: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_{EVALUE}_id.txt"
 	output: "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_{EVALUE}_pdb.fasta"
 	shell: "IFS=$'\n'; for i in $(cat {input}); do esearch -db protein -query $i | efetch -format fasta; done > {output}"
+
+rule combine_data:
+	input: 
+		pdb_fasta = "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_{EVALUE}_pdb.fasta",
+		blastp_tsv = "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_{EVALUE}_blastp_result.tsv",
+		int_tsv = "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_intersected_prot.tsv"
+	output: 
+		full = "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_{EVALUE}_combine_data.tsv",
+		omit_NA = "{DATA_PATH}{PREFIX}{MIN_ORF_LENGTH}_{MIN_INT_LENGTH}_{EVALUE}_combine_data_omit_NA.tsv"
+	shell: "python3 {SCRIPTS_PATH}combine_data.py -input_pdb_fasta {input.pdb_fasta} -input_blastp_tsv {input.blastp_tsv} -input_intersected_tsv {input.int_tsv} -output {output.full} -output_omit_NA {output.omit_NA}"

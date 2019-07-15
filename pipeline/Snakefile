@@ -22,7 +22,7 @@ rule parse_frame_shifts:
 	run:
 		shell("python3 scripts/parse_fs.py -input {input} -output_full_tsv {output.full_tsv} -output_subset_fasta {output.subset_fasta} -output_subset_tsv {output.subset_tsv}")
 
-rule cdhit_filter:
+rule cdhit_filter:	
 	input: "data/Scler_300_100_intersected_prot.fasta"
 	output: "data/Scler_300_100_cdhit_filtred.fasta"
 	shell: "cdhit -i {input} -o {output} -c 0.75 -s 0.75"
@@ -30,7 +30,7 @@ rule cdhit_filter:
 rule blastp:
 	input: "data/Scler_300_100_cdhit_filtred.fasta"
 	output: "data/Scler_300_100_001_blastp_result.tsv"
-	shell: "blastp -db data/pdb_db/pdbaa -query {input} -evalue 0.01 -max_target_seqs 1 -outfmt '6 qseqid sseqid evalue qseq sseq' -out {output}"
+	shell: "blastp -db data/pdb_db/pdbaa -query {input} -evalue 0.01 -max_target_seqs 1 -max_hsps 1 -outfmt '6 qseqid sseqid evalue qseq sseq' -out {output}"
 
 rule get_id:
 	input: "data/Scler_300_100_001_blastp_result.tsv"
@@ -41,3 +41,13 @@ rule efetch_sequences:
 	input: "data/Scler_300_100_001_id.txt"
 	output: "data/Scler_300_100_001_pdb.fasta"
 	shell: "IFS=$'\n'; for i in $(cat {input}); do esearch -db protein -query $i | efetch -format fasta; done > {output}"
+
+rule combine_data:
+	input: 
+		pdb_fasta = "data/Scler_300_100_001_pdb.fasta",
+		blastp_tsv = "data/Scler_300_100_001_blastp_result.tsv",
+		int_tsv = "data/Scler_300_100_intersected_prot.tsv"
+	output: 
+		full = "data/Scler_300_100_001_combine_data.tsv",
+		omit_NA = "data/Scler_300_100_001_combine_data_omit_NA.tsv"
+	shell: "python3 scripts/combine_data.py -input_pdb_fasta {input.pdb_fasta} -input_blastp_tsv {input.blastp_tsv} -input_intersected_tsv {input.int_tsv} -output {output.full} -output_omit_NA {output.omit_NA}"
